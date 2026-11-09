@@ -122,7 +122,11 @@ the design system can never drift into a second, divergent copy.
   `@theme` preset, the Tier-3 `--el-*` element tokens, and every
   `[data-palette]` / `[data-style]` / `[data-type]` / `[data-surface]` swap
   block. Reference colour through the `--el-*` tokens (e.g.
-  `text-(--el-text)`, `bg-(--el-surface)`), never raw hexes.
+  `text-(--el-text)`, `bg-(--el-surface)`), never raw hexes. It also carries
+  `@source '../node_modules/@motir/design-system/dist';`, because Tailwind v4
+  skips `node_modules` when it looks for class names: without that line, a
+  utility used only inside a package component (the specimen headline's serif
+  face, its two-column vignette grid) is never generated.
 - **`app/layout.tsx`** loads the type-axis fonts (as `--font-*-source`
   variables), sets the **project's** design on `<html>` from
   [`motir.design.json`](motir.design.json) via

@@ -17,6 +17,17 @@
  */
 @import '@motir/design-system/theme.css';
 
+/*
+ * Tailwind v4's automatic source detection skips node_modules, so a utility
+ * that appears ONLY inside the package's compiled components (the serif-face
+ * utility on the TokensSpecimen headline, the two-column breakpoint on its
+ * vignette grid, …) would never be generated here. Do not spell those class
+ * names out in this repo's files: Tailwind scans them too, and a literal class
+ * name anywhere would mask a missing @source. Point Tailwind at the package's built output so
+ * those classes exist. The path is relative to this file.
+ */
+@source '../node_modules/@motir/design-system/dist';
+
 body {
   background-color: var(--el-page-bg);
   color: var(--el-page-text);
