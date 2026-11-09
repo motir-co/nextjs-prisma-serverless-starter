@@ -69,8 +69,10 @@ describe('app/globals.css imports the package token CSS (no vendored copy)', () 
 
   it("@sources the package's built components so their utilities are generated", () => {
     // Tailwind v4 skips node_modules when it detects sources, so without this
-    // line a class used only inside a package component (`font-serif`,
-    // `sm:grid-cols-2`) is never emitted and the component renders unstyled.
+    // line a class used only inside a package component (the specimen
+    // headline's serif face, its two-column grid) is never emitted and the
+    // component renders unstyled. Never write those class names literally in
+    // this repo: Tailwind scans these files too and would mask the bug.
     const match = css.match(/@source\s+['"]([^'"]*@motir\/design-system\/dist)['"]\s*;/);
     expect(match).not.toBeNull();
     // The path must resolve, from app/, to the installed package's own `dist`
