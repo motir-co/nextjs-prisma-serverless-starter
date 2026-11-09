@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -65,6 +65,23 @@ describe('app/globals.css imports the package token CSS (no vendored copy)', () 
 
   it('@imports @motir/design-system/theme.css', () => {
     expect(css).toContain("@import '@motir/design-system/theme.css'");
+  });
+
+  it("@sources the package's built components so their utilities are generated", () => {
+    // Tailwind v4 skips node_modules when it detects sources, so without this
+    // line a class used only inside a package component (`font-serif`,
+    // `sm:grid-cols-2`) is never emitted and the component renders unstyled.
+    const match = css.match(/@source\s+['"]([^'"]*@motir\/design-system\/dist)['"]\s*;/);
+    expect(match).not.toBeNull();
+    // The path must resolve, from app/, to the installed package's own `dist`
+    // (where its components' compiled JS lives) — not just look right. The
+    // package exports only `import` conditions and `./theme.css`, so locate its
+    // root through the CSS export. realpath both sides: pnpm links
+    // node_modules/@motir/* into .pnpm/.
+    const sourced = realpathSync(resolve(repoRoot, 'app', match![1]!));
+    const pkgRoot = dirname(realpathSync(require.resolve('@motir/design-system/theme.css')));
+    expect(sourced).toBe(resolve(pkgRoot, 'dist'));
+    expect(existsSync(resolve(sourced, 'index.js'))).toBe(true);
   });
 
   it('drops the old hand-rolled raw-hex palette vars', () => {
